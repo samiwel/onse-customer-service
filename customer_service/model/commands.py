@@ -4,3 +4,7 @@ def get_customer(customer_id, customer_repository):
 
 def create_customer(customer, customer_repository):
     customer_repository.store(customer)
+
+
+def update_customer(customer, customer_repository):
+    customer_repository.store(customer)
