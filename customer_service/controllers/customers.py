@@ -65,16 +65,14 @@ def update_customer(customer_id):
 
     UPDATE_PAYLOAD_SCHEMA.validate(body)
 
-    customer = Customer(customer_id=int(customer_id),
-                        first_name=body['firstName'],
-                        surname=body['surname'])
-
-    commands.update_customer(customer=customer,
+    commands.update_customer(customer_id=int(customer_id),
+                             first_name=body['firstName'],
+                             surname=body['surname'],
                              customer_repository=customer_repository)
 
-    return jsonify(customerId=str(customer.customer_id),
-                   firstName=customer.first_name,
-                   surname=customer.surname), HTTPStatus.OK
+    return jsonify(customerId=str(customer_id),
+                   firstName=body['firstName'],
+                   surname=body['surname']), HTTPStatus.OK
 
 
 @customers.errorhandler(CustomerNotFound)

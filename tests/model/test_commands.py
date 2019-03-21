@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock
+
 import pytest
 
 from customer_service.model import commands
@@ -31,3 +33,27 @@ def test_create_customer(customer_repository):
 
     assert stored_customer.first_name == 'Nicole'
     assert stored_customer.surname == 'Forsgren'
+
+
+def test_update_customer_name(customer_repository):
+
+    mock_fetch_by_id = MagicMock()
+    mock_fetch_by_id.return_value = Customer(customer_id=5,
+                                             first_name="Susan",
+                                             surname="Davies")
+
+    customer_repository.fetch_by_id = mock_fetch_by_id
+
+    mock_store = MagicMock()
+    customer_repository.store = mock_store
+
+    commands.update_customer(customer_id=5,
+                             first_name="Bob",
+                             surname="Jones",
+                             customer_repository=customer_repository)
+
+    mock_fetch_by_id.assert_called_once_with(5)
+
+    store_argument = mock_store.call_args_list[0][0][0]
+    assert store_argument.first_name == "Bob"
+    assert store_argument.surname == "Jones"
