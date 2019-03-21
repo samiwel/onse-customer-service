@@ -77,3 +77,43 @@ def test_create_customer_with_bad_context_type(web_client):
     response = web_client.post('/customers/', data='not json')
     assert response.status_code == 415
     assert response.get_json()['message'] == 'Request must be application/json'
+
+
+def test_update_customer_not_found(web_client):
+    response = web_client.put('/customers/5', data='not json')
+    assert response.status_code == 415
+    assert response.get_json()['message'] == 'Request must be application/json'
+
+
+@pytest.mark.parametrize(
+    'bad_payload',
+    [dict(),
+     dict(firstName='Joe', surname='Bloggs', unknown='value'),
+     dict(firstName='', surname='Bloggs'),
+     dict(firstName='Joe', surname='')])
+def test_update_customer_with_bad_payload(web_client, bad_payload):
+    response = web_client.put('/customers/5', json=bad_payload)
+    assert response.status_code == 400
+
+
+@patch('customer_service.model.commands.update_customer')
+def test_update_customer(update_customer, web_client, customer_repository):
+    request_body = dict(firstName='Jez', surname='Humble')
+    response = web_client.put('/customers/5', json=request_body)
+
+    assert response.status_code == 200
+
+    update_customer.assert_called_with(
+        customer_id=5,
+        first_name="Jez",
+        surname="Humble",
+        customer_repository=customer_repository)
+
+    assert response.is_json
+
+    customer = response.get_json()
+
+    assert customer == dict(
+        firstName='Jez',
+        surname='Humble',
+        customerId='5')
