@@ -31,4 +31,3 @@ def test_create_customer(customer_repository):
 
     assert stored_customer.first_name == 'Nicole'
     assert stored_customer.surname == 'Forsgren'
-
